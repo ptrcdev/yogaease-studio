@@ -165,7 +165,7 @@ export default function Index() {
       {/* ── HERO ── */}
       <section className="relative min-h-screen overflow-hidden" style={{background: "radial-gradient(ellipse at 50% 0%, #e8b898 0%, #dfa882 30%, #c8845a 70%, #a8623a 100%)"}}>
 
-        {/* Big stacked text */}
+        {/* Big stacked text — BEHIND figure */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
           style={{paddingTop: "4rem"}}>
           {["WELLNESS", "YOGA", "THROUGH"].map((word, i) => (
@@ -185,6 +185,11 @@ export default function Index() {
               {word}
             </motion.div>
           ))}
+        </div>
+
+        {/* Navbar overlay sits on top */}
+        <div className="relative z-50">
+          {/* already rendered above */}
         </div>
 
         {/* Stat card — bottom left */}
@@ -487,7 +492,7 @@ export default function Index() {
               A space where <span className="italic">wellness</span> becomes a way of life
             </h2>
             <p className="text-[#2a1a0e]/70 leading-relaxed mb-5">
-              Founded in 2012, YogaEase was born from a belief that true fitness encompasses body, mind, and spirit.
+              Founded in 2012, YogaEase was born from a belief that true fitness encompasses body, mind, and spirit. Our boutique space combines the best of yoga tradition with modern strength methodology.
             </p>
             <p className="text-[#2a1a0e]/70 leading-relaxed mb-8">
               We cap our classes at 15 members so every person receives personalised attention from our world-class instructors.
