@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import {
   ArrowRight,
@@ -121,52 +121,164 @@ export default function Index() {
 
       {/* ── NAVBAR ── */}
       <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-12 py-6">
-        <a href="#" className="flex items-center gap-2 font-bold text-[#2a1a0e] text-lg tracking-wide">
+        <motion.a
+          href="#"
+          className="flex items-center gap-2 font-bold text-[#2a1a0e] text-lg tracking-wide"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2a1 1 0 0 1 .894.553l2.618 5.303 5.852.85a1 1 0 0 1 .555 1.705l-4.235 4.127.999 5.826a1 1 0 0 1-1.451 1.054L12 18.902l-5.232 2.75a1 1 0 0 1-1.45-1.054l.998-5.826L2.08 10.41a1 1 0 0 1 .556-1.704l5.852-.851L11.106 2.553A1 1 0 0 1 12 2z"/>
           </svg>
           YOGAEASE
-        </a>
+        </motion.a>
         <nav className="hidden md:flex gap-10 items-center">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="text-sm font-medium text-[#2a1a0e]/80 hover:text-[#2a1a0e] transition-colors">
+            <motion.a
+              key={l.label}
+              href={l.href}
+              className="relative text-sm font-medium text-[#2a1a0e]/80 hover:text-[#2a1a0e] transition-colors"
+              whileHover={{ y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
               {l.label}
-            </a>
+              <motion.span
+                className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#5c2e0e] origin-left"
+                initial={{ scaleX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              />
+            </motion.a>
           ))}
         </nav>
-        <button className="hidden md:flex size-9 items-center justify-center rounded-full border border-[#2a1a0e]/30">
+        <motion.button
+          className="hidden md:flex size-9 items-center justify-center rounded-full border border-[#2a1a0e]/30"
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <Menu className="size-4 text-[#2a1a0e]" />
-        </button>
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
-        </button>
+        </motion.button>
+        <motion.button
+          className="md:hidden"
+          onClick={() => setMenuOpen(!menuOpen)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {menuOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X className="size-6" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu className="size-6" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
       </header>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed inset-0 z-40 bg-[#f0d5bf] pt-20 px-8 flex flex-col gap-6"
-        >
-          {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)}
-              className="text-3xl font-bold text-[#2a1a0e] border-b border-[#2a1a0e]/20 pb-4">
-              {l.label}
-            </a>
-          ))}
-          <a href="#pricing" onClick={() => setMenuOpen(false)}
-            className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#5c2e0e] text-white text-base font-medium rounded-full">
-            Begin Journey <ArrowRight className="size-4" />
-          </a>
-        </motion.div>
-      )}
+      {/* Mobile / Desktop menu overlay */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-40 bg-[#2a1a0e]/40 backdrop-blur-sm"
+              onClick={() => setMenuOpen(false)}
+            />
+            {/* Menu panel */}
+            <motion.div
+              key="menu-panel"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-[#f0d5bf] shadow-2xl flex flex-col"
+            >
+              {/* Close button */}
+              <div className="flex justify-end p-8 pb-0">
+                <motion.button
+                  onClick={() => setMenuOpen(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="size-10 flex items-center justify-center rounded-full border border-[#2a1a0e]/20"
+                >
+                  <X className="size-5 text-[#2a1a0e]" />
+                </motion.button>
+              </div>
+              {/* Links */}
+              <nav className="flex flex-col gap-2 px-8 mt-8">
+                {NAV_LINKS.map((l, i) => (
+                  <motion.a
+                    key={l.label}
+                    href={l.href}
+                    onClick={() => setMenuOpen(false)}
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{
+                      delay: i * 0.08,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 24,
+                    }}
+                    className="group text-3xl font-bold text-[#2a1a0e] border-b border-[#2a1a0e]/10 pb-4 flex items-center gap-3"
+                  >
+                    <span className="text-sm font-normal text-[#a8623a] opacity-0 group-hover:opacity-100 transition-opacity">
+                      0{i + 1}
+                    </span>
+                    {l.label}
+                    <ArrowRight className="size-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  </motion.a>
+                ))}
+              </nav>
+              {/* CTA */}
+              <div className="px-8 mt-auto mb-12">
+                <motion.a
+                  href="#pricing"
+                  onClick={() => setMenuOpen(false)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 24 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#5c2e0e] text-white text-base font-medium rounded-full w-full"
+                >
+                  Begin Journey <ArrowRight className="size-4" />
+                </motion.a>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── HERO ── */}
       <section className="relative min-h-screen overflow-hidden" style={{background: "radial-gradient(ellipse at 50% 0%, #e8b898 0%, #dfa882 30%, #c8845a 70%, #a8623a 100%)"}}>
 
         {/* Big stacked text — BEHIND figure */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none overflow-hidden"
           style={{paddingTop: "4rem"}}>
           {["WELLNESS", "YOGA", "THROUGH"].map((word, i) => (
             <motion.div
@@ -178,7 +290,7 @@ export default function Index() {
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(80px, 18vw, 220px)",
+                fontSize: "clamp(60px, 18vw, 220px)",
                 letterSpacing: "-0.01em",
               }}
             >
@@ -187,80 +299,85 @@ export default function Index() {
           ))}
         </div>
 
-        {/* Navbar overlay sits on top */}
-        <div className="relative z-50">
-          {/* already rendered above */}
+        {/* Desktop layout — original absolute positioning */}
+        <div className="hidden md:block">
+          {/* Stat card — bottom left */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="absolute bottom-75 left-12 z-20"
+          >
+            <p className="text-white font-bold text-6xl leading-none" style={{fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900}}>
+              95%
+            </p>
+            <p className="text-[#ffff]/70 text-sm mt-1 max-w-[130px] leading-snug">Yogis feeling calm<br/>and balanced.</p>
+          </motion.div>
+
+          {/* CTA + description — top right */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="absolute top-85 right-12 z-20 max-w-[260px]"
+          >
+            <p className="text-white/80 text-sm leading-relaxed mb-5">
+              Guided yoga programs that help you feel stronger, lighter, and more centered every day.
+            </p>
+            <a href="#classes"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#2a1a0e] text-[#f0d5bf] text-sm font-medium hover:bg-[#3d2512] transition-colors cursor-pointer">
+              Begin Journey
+            </a>
+          </motion.div>
         </div>
 
-        {/* Stat card — bottom left */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="absolute bottom-24 left-8 md:left-12 z-20"
-        >
-          <p className="text-[#2a1a0e] font-bold text-5xl md:text-6xl leading-none" style={{fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900}}>
-            95%
-          </p>
-          <p className="text-[#2a1a0e]/70 text-sm mt-1 max-w-[130px] leading-snug">Yogis feeling calm<br/>and balanced.</p>
-        </motion.div>
+        {/* Mobile layout — improved */}
+        <div className="md:hidden relative z-10 flex flex-col min-h-screen px-8 pt-28 pb-8">
+          {/* Decorative line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            className="absolute top-24 left-8 right-8 h-px bg-gradient-to-r from-white/30 via-white/10 to-transparent origin-left"
+          />
 
-        {/* Tagline — bottom left below stat */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="absolute bottom-6 left-8 md:left-12 z-20"
-        >
-          <p className="text-[#2a1a0e]/60 text-xs max-w-[200px] leading-relaxed">
-            Simple Guided Yoga To Stay Active, Reduce Stress, And Feel Balanced.
-          </p>
-        </motion.div>
+          {/* Stat card — top */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="text-white font-bold text-6xl leading-none" style={{fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900}}>
+              95%
+            </span>
+            <p className="text-white/60 text-xs tracking-widest uppercase mt-2">Yogis feeling calm and balanced</p>
+          </motion.div>
 
-        {/* CTA + description — top right */}
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="absolute top-28 right-8 md:right-12 z-20 max-w-[260px]"
-        >
-          <p className="text-[#2a1a0e]/80 text-sm leading-relaxed mb-5">
-            Guided yoga programs that help you feel stronger, lighter, and more centered every day.
-          </p>
-          <a href="#classes"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#2a1a0e] text-[#f0d5bf] text-sm font-medium hover:bg-[#3d2512] transition-colors cursor-pointer">
-            Begin Journey
-          </a>
-        </motion.div>
-
-        {/* Video card — bottom right */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="absolute bottom-8 right-8 md:right-12 z-20 bg-[#f5e8d8]/90 backdrop-blur-sm rounded-2xl p-4 w-[260px] shadow-lg"
-        >
-          <div className="flex gap-3">
-            <div className="relative shrink-0 w-20 h-20 rounded-xl overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1697274834392-04ff3b76ef20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200"
-                alt="Video thumbnail"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="size-7 rounded-full bg-[#2a1a0e]/80 flex items-center justify-center">
-                  <Play className="size-3 text-white fill-white ml-0.5" />
-                </div>
-              </div>
+          {/* CTA + description — bottom */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-auto"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-px bg-white/30" />
+              <span className="text-white/50 text-[10px] tracking-[0.3em] uppercase">Studio</span>
             </div>
-            <div>
-              <p className="font-semibold text-[#2a1a0e] text-sm leading-tight">Balance Your Body<br/>{"&"} Mind.</p>
-              <p className="text-[#2a1a0e]/60 text-xs mt-1.5 leading-relaxed">
-                Practice Yoga at home anytime to energize your body, calm your mind.
-              </p>
-            </div>
-          </div>
-        </motion.div>
+            <p className="text-white/70 text-sm leading-relaxed mb-6 max-w-[280px] font-light">
+              Guided yoga programs that help you feel stronger, lighter, and more centered every day.
+            </p>
+            <motion.a
+              href="#classes"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-[#2a1a0e]/90 text-[#f0d5bf] text-sm font-medium hover:bg-[#2a1a0e] transition-colors cursor-pointer group"
+            >
+              Begin Journey
+              <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+            </motion.a>
+          </motion.div>
+        </div>
 
         {/* Scroll cue */}
         <a href="#classes"
