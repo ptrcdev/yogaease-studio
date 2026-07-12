@@ -28,3 +28,7 @@ tsconfig.tsbuildinfo
 
 # Environment variables
 .env*
+
+.agents
+.claude
+.convex
